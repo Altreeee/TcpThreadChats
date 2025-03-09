@@ -6,7 +6,13 @@ import sys
 import socket
 import thread
 
-
+'''
+MyThread 类: 继承自 QtCore.QThread，用于在单独线程中接收数据。
+run 方法:
+循环接收来自服务器的数据。
+若没有接收到数据或出现异常，则终止循环，并调用 disConnect 方法断开连接。
+收到数据时，将数据添加到接收信息的文本框中显示。
+'''
 class MyThread(QtCore.QThread):
 
 	def __init__(self, win):
@@ -26,7 +32,12 @@ class MyThread(QtCore.QThread):
 			print data
 		self.win.disConnect()
 
-
+'''
+Client 类: 继承自 QtGui.QWidget，为客户端程序的主窗口。
+布局和组件:
+使用 QtGui.QGridLayout 创建布局。
+添加了 IP 地址和端口号的输入框，用于用户输入服务器的地址和端口。
+'''
 class Client(QtGui.QWidget):
 
 	BUF_LEN = 1024
@@ -106,9 +117,17 @@ class Client(QtGui.QWidget):
 				self.txt_recvMessage.append(u'服务器连接失败，请检查网络连接或者稍后再试。')
 				return
 
-			thread.start_new_thread(self.recv_func, ())
+			thread.start_new_thread(self.recv_func, ()) 
+			'''
+			self.recv_func 是一个接收服务器消息的函数，运行在单独的线程中，避免阻塞主线程（GUI 线程）。
+			这样，客户端可以同时接收服务器的消息和处理用户的输入。
+			'''
 			# td = MyThread(self)
 			# td.start()
+			'''
+			注释掉的代码是另一种实现方式，使用 MyThread 类（继承自 QThread）来处理接收消息的逻辑。
+			当前代码选择了更简单的 thread.start_new_thread 方法。
+			'''
 			self.txt_recvMessage.append(u'服务器连接成功！')
 			self.setWindowTitle(self.windowTitle() + ' --> ' + host + ':' + str(port))
 			self.isConnected = True
